@@ -1,0 +1,69 @@
+﻿@using NotesManager.Models
+@using NotesManager.Services
+@inject INotesManager _INotesManager
+@inject NavigationManager _Navigation
+@rendermode InteractiveServer
+
+@page "/notes"
+
+<PageTitle>Notes Manager | Notes</PageTitle>
+
+<h1>Notes</h1>
+<br />
+
+<button class="btn btn-primary" @onclick="@(() => _Navigation.NavigateTo("/notes/add-notes"))">Add Note</button>
+<br />
+<br />
+<br />
+
+@if (isPending)
+{
+    <p>loading...</p>
+}
+@if (notes != null)
+{
+
+    <table class="table-dark table-hover table">
+            <caption>Notes</caption>
+        <thead class ="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Created At</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+            <tbody>
+            @foreach (var note in notes)
+            {
+                <tr>
+                    <th scope="row">@note.Id</th>
+                    <td>@note.Title</td>
+                    <td>@note.Description</td>
+                        <td>@note.CreatedAt</td>
+                    <td>
+                        <button class="btn btn-outline-light" @onclick="@(() => _Navigation.NavigateTo($"/notes/{note.Id}"))">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>notes not found</p>
+}
+
+
+@code {
+    private List<Note>? notes { get; set; } = null;
+    private bool isPending { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isPending = true;
+        notes = await _INotesManager.GetNotes();
+        isPending = false;
+    }
+}

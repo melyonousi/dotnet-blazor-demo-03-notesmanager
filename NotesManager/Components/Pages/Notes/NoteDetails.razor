@@ -1,0 +1,61 @@
+﻿@using NotesManager.Models
+@using NotesManager.Services
+@inject INotesManager _INote
+@inject NavigationManager _Navigate
+@rendermode InteractiveAuto
+@page "/notes/{id:int}"
+
+@if (note != null)
+{
+    <PageTitle>Note Manager | @note.Title</PageTitle>
+}
+
+<h3>Note Details</h3>
+
+@if(note != null)
+{
+    <EditForm Model="note" FormName="UpdateNote" OnSubmit="UpdateNote">
+        <InputText class="form-control" DisplayName="Title" type="text" @bind-Value="note.Title">@note.Title</InputText>
+        <ValidationMessage For="() => note.Title" />
+            <br/>
+        <InputTextArea class="form-control" DisplayName="Description" @bind-Value="note.Description">@note.Description</InputTextArea>
+        <ValidationMessage For="() => note.Description" />
+            <br/>
+        <button class="btn btn-info">Update</button>
+    </EditForm>
+    <br/>
+    <button class="btn btn-danger" @onclick="() => deleteNote(note)">Delete</button>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Note note { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        note = await _INote.GetNote(Id);
+    }
+
+    private async void UpdateNote()
+    {
+        var _note = await _INote.UpdateNote(note);
+        if(_note != null) 
+        {
+            await _INote.GetNotes();
+            _Navigate.NavigateTo("/notes");
+        }
+    }
+
+    private async void deleteNote(Note _note)
+    {
+        var nte = await _INote.DeleteNote(_note.Id);
+
+        if (nte != null)
+        {
+            await _INote.GetNotes();
+            _Navigate.NavigateTo("/notes");
+        }
+    }
+}

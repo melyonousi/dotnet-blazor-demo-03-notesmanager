@@ -1,0 +1,5 @@
+﻿#install EF
+	Microsoft.EntityFrameworkCore
+	Microsoft.EntityFrameworkCore.Sql
+	Microsoft.EntityFrameworkCore.Tools
+	Microsoft.EntityFrameworkCore.Design

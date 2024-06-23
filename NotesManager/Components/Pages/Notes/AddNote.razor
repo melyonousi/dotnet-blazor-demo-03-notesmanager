@@ -1,0 +1,38 @@
+﻿@using NotesManager.Models
+@using NotesManager.Services
+@inject INotesManager _NoteManager
+@inject NavigationManager _Navigation
+
+@rendermode InteractiveServer
+
+@page "/notes/add-notes"
+
+<PageTitle>Notes Manager | Add New Note</PageTitle>
+
+<h3>Add Note</h3> <br />
+
+<EditForm Model="note" FormName="NewNote" OnSubmit="SaveNote">
+    <InputText class="form-control" DisplayName="Title" type="text" @bind-Value="note.Title">@note.Title</InputText>
+    <ValidationMessage For="() => note.Title"/> <br />
+    <InputTextArea class="form-control" DisplayName="Description" @bind-Value="note.Description">@note.Description</InputTextArea>
+    <ValidationMessage For="() => note.Description" /><br />
+
+    <button class="btn btn-primary">Add Note</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private Note note { get; set; } = new();
+
+    private async void SaveNote()
+    {
+        var _note = await _NoteManager.AddNote(note);
+        if(_note != null)
+        {
+            await _NoteManager.GetNotes();
+            _Navigation.NavigateTo("/notes");
+            note.Title = string.Empty;
+            note.Description = string.Empty;
+        }
+    }
+}
